@@ -14,15 +14,15 @@ const apiRequest = async (link) => {
 let worksData = await apiRequest(worksApi)
 let categoriesData = await apiRequest(categoriesApi)
 
-const gallery = document.getElementsByClassName('gallery')[0]
+const gallery = document.querySelector('.gallery')
 const filters = document.getElementById('filters')
 const loginBtn = document.getElementById('loginBtn')
-const titleDiv = document.getElementsByClassName('title__div')[0]
+const titleDiv = document.querySelector('.title__div')
 const portfolio = document.getElementById('portfolio')
 
 if (localStorage.token) {
   loginBtn.addEventListener('click', () => {
-    location.reload, (localStorage.removeItem('token'))
+    location.reload, localStorage.removeItem('token')
   })
   loginBtn.children[0].textContent = 'logout'
   filters.remove()
@@ -32,9 +32,79 @@ if (localStorage.token) {
   initFilters()
 }
 
-function initModifyPopup() {
+function initModifyPopupElements() {
   const modifyWindow = document.createElement('div')
+  const form = document.createElement('form')
+  const topDiv = document.createElement('div')
+  const img = document.createElement('img')
+  const xmark = document.createElement('img')
+  const h2 = document.createElement('h2')
+  const modifyGallery = document.createElement('div')
+  const lineBlack = document.createElement('div')
+  const button = document.createElement('button')
+
+  return {
+    modifyWindow,
+    form,
+    topDiv,
+    img,
+    xmark,
+    h2,
+    modifyGallery,
+    lineBlack,
+    button,
+  }
+}
+
+function initModifyPopupAttributes() {
+  const {
+    modifyWindow,
+    form,
+    topDiv,
+    img,
+    xmark,
+    h2,
+    modifyGallery,
+    lineBlack,
+    button,
+  } = initModifyPopupElements()
+
   modifyWindow.classList.add('modify__window')
+  topDiv.classList.add('top__div')
+  modifyGallery.classList.add('modify__gallery')
+  lineBlack.classList.add('line__black')
+  img.src = ''
+  img.alt = ''
+  xmark.src = './assets/icons/xmark.svg'
+  xmark.alt = 'xmark'
+  h2.textContent = 'Galerie photo'
+  button.textContent = 'Ajouter une photo'
+
+  return {
+    modifyWindow,
+    form,
+    topDiv,
+    img,
+    xmark,
+    h2,
+    modifyGallery,
+    lineBlack,
+    button,
+  }
+}
+
+function initModifyPopupEventListener() {
+  const {
+    modifyWindow,
+    form,
+    topDiv,
+    img,
+    xmark,
+    h2,
+    modifyGallery,
+    lineBlack,
+    button,
+  } = initModifyPopupAttributes()
 
   modifyWindow.addEventListener('click', (e) => {
     if (e.target === modifyWindow) {
@@ -42,112 +112,218 @@ function initModifyPopup() {
     }
   })
 
-  const form = document.createElement('form')
-
-  const topDiv = document.createElement('div')
-  topDiv.classList.add('top__div')
-
-  const img = document.createElement('img')
-  img.src = ''
-  img.alt = ''
-  const xmark = document.createElement('img')
-  xmark.src = './assets/icons/xmark.svg'
-  xmark.alt = 'xmark'
   xmark.addEventListener('click', () => removePopup())
-  topDiv.appendChild(img)
-  topDiv.appendChild(xmark)
-  form.appendChild(topDiv)
 
-  const h2 = document.createElement('h2')
-  h2.textContent = 'Galerie photo'
-  form.appendChild(h2)
-
-  const modifyGallery = document.createElement('div')
-  modifyGallery.classList.add('modify__gallery')
-  for (let i = 0; i < worksData.length; i++) {
-    const e = worksData[i]
-    const div = document.createElement('div')
-    div.classList.add(e.categoryId)
-    const img = document.createElement('img')
-    img.src = e.imageUrl
-    img.alt = e.title
-    div.appendChild(img)
-    const div2 = document.createElement('div')
-    const trashIcon = document.createElement('img')
-    trashIcon.src = './assets/icons/trash.svg'
-    trashIcon.alt = 'trashIcon'
-    trashIcon.addEventListener('click', () => removeWork(e.id))
-    div2.appendChild(trashIcon)
-    div.appendChild(div2)
-    modifyGallery.appendChild(div)
-  }
-  form.appendChild(modifyGallery)
-
-  const lineBlack = document.createElement('div')
-  lineBlack.classList.add('line__black')
-  form.appendChild(lineBlack)
-
-  const button = document.createElement('button')
-  button.textContent = 'Ajouter une photo'
   button.addEventListener(
     'click',
     () => initImgUpload({ img, h2, modifyGallery, button, form }),
     { once: true }
   )
+
+  return {
+    modifyWindow,
+    form,
+    topDiv,
+    img,
+    xmark,
+    h2,
+    modifyGallery,
+    lineBlack,
+    button,
+  }
+}
+
+function initModifyPopupGallery() {
+  const {
+    modifyWindow,
+    form,
+    topDiv,
+    img,
+    xmark,
+    h2,
+    modifyGallery,
+    lineBlack,
+    button,
+  } = initModifyPopupEventListener()
+
+  for (let i = 0; i < worksData.length; i++) {
+    const element = worksData[i]
+    const div = document.createElement('div')
+    div.classList.add(element.categoryId)
+    const img = document.createElement('img')
+    img.src = element.imageUrl
+    img.alt = element.title
+    div.appendChild(img)
+    const div2 = document.createElement('div')
+    const trashIcon = document.createElement('img')
+    trashIcon.src = './assets/icons/trash.svg'
+    trashIcon.alt = 'trashIcon'
+    trashIcon.addEventListener('click', () => removeWork(element.id))
+    div2.appendChild(trashIcon)
+    div.appendChild(div2)
+    modifyGallery.appendChild(div)
+  }
+
+  return {
+    modifyWindow,
+    form,
+    topDiv,
+    img,
+    xmark,
+    h2,
+    modifyGallery,
+    lineBlack,
+    button,
+  }
+}
+
+function initModifyPopup() {
+  const {
+    modifyWindow,
+    form,
+    topDiv,
+    img,
+    xmark,
+    h2,
+    modifyGallery,
+    lineBlack,
+    button,
+  } = initModifyPopupGallery()
+
+  topDiv.appendChild(img)
+  topDiv.appendChild(xmark)
+  form.appendChild(topDiv)
+  form.appendChild(h2)
+  form.appendChild(modifyGallery)
+  form.appendChild(lineBlack)
   form.appendChild(button)
-
   modifyWindow.appendChild(form)
-
   portfolio.insertBefore(modifyWindow, gallery)
 }
 
 async function removeWork(workId) {
-  const response = await fetch(`${worksApi}/${workId}`, {
+  await fetch(`${worksApi}/${workId}`, {
     method: 'DELETE',
     headers: {
       Authorization: 'Bearer ' + localStorage.token,
     },
   })
 
-  for (let i = 0; i < worksData.length; i++) {
-    const e = worksData[i]
-    if (e.id === workId) {
-      const index = worksData.indexOf(e)
-      worksData.splice(index, 1)
-    }    
-  }
-
   initGallery()
   removePopup()
   initModifyPopup()
 }
 
-function initImgUpload(tagToModify) {
-  let [img, h2, modifyGallery, button, form] = Object.values(tagToModify)
+function initImgUploadElements() {
+  const div = document.createElement('div')
+  const imgLogo = document.createElement('img')
+  const addImgLabel = document.createElement('label')
+  const addImg = document.createElement('input')
+  const imgInfo = document.createElement('span')
+  const titleLabel = document.createElement('label')
+  const titleInput = document.createElement('input')
+  const categoryLabel = document.createElement('label')
+  const categorySelect = document.createElement('select')
+  const defaultOption = document.createElement('option')
+
+  return {
+    div,
+    imgLogo,
+    addImgLabel,
+    addImg,
+    imgInfo,
+    titleLabel,
+    titleInput,
+    categoryLabel,
+    categorySelect,
+    defaultOption,
+  }
+}
+
+function initImgUploadAttributes(tagToModify) {
+  const {
+    div,
+    imgLogo,
+    addImgLabel,
+    addImg,
+    imgInfo,
+    titleLabel,
+    titleInput,
+    categoryLabel,
+    categorySelect,
+    defaultOption,
+  } = initImgUploadElements()
+  const { img, h2, modifyGallery, button, form } = tagToModify
 
   img.src = './assets/icons/arrow-left.svg'
   img.alt = 'arrowLeft'
+  h2.textContent = 'Ajout photo'
+  modifyGallery.innerHTML = ''
+  modifyGallery.classList = 'upload'
+  div.classList.add('upload__div')
+  imgLogo.src = './assets/icons/img__logo.svg'
+  imgLogo.classList.add('img__logo')
+  addImgLabel.setAttribute('for', 'addImg')
+  addImgLabel.textContent = '+ Ajouter photo'
+  addImg.type = 'file'
+  addImg.id = 'addImg'
+  imgInfo.textContent = 'jpg, png : 4mo max'
+  titleLabel.textContent = 'Titre'
+  titleLabel.classList.add('upload__label')
+  titleInput.type = 'text'
+  titleInput.name = 'title'
+  categoryLabel.textContent = 'Catégorie'
+  categoryLabel.classList.add('upload__label')
+  categorySelect.name = 'category'
+  defaultOption.hidden = true
+  defaultOption.disabled = true
+  defaultOption.selected = true
+  defaultOption.value = ''
+  button.disabled = true
+  button.textContent = 'Valider'
+
+  return {
+    div,
+    imgLogo,
+    addImgLabel,
+    addImg,
+    imgInfo,
+    titleLabel,
+    titleInput,
+    categoryLabel,
+    categorySelect,
+    defaultOption,
+    img,
+    h2,
+    modifyGallery,
+    button,
+    form,
+  }
+}
+
+function initImgUploadEventListener(tagToModify) {
+  const {
+    div,
+    imgLogo,
+    addImgLabel,
+    addImg,
+    imgInfo,
+    titleLabel,
+    titleInput,
+    categoryLabel,
+    categorySelect,
+    defaultOption,
+    img,
+    h2,
+    modifyGallery,
+    button,
+    form,
+  } = initImgUploadAttributes(tagToModify)
+
   img.addEventListener('click', () => {
     removePopup()
     initModifyPopup()
   })
-
-  h2.textContent = 'Ajout photo'
-
-  modifyGallery.innerHTML = ''
-  modifyGallery.classList = 'upload'
-
-  const div = document.createElement('div')
-  div.classList.add('upload__div')
-  const imgLogo = document.createElement('img')
-  imgLogo.src = './assets/icons/img__logo.svg'
-  imgLogo.classList.add('img__logo')
-  const addImgLabel = document.createElement('label')
-  addImgLabel.setAttribute('for', 'addImg')
-  addImgLabel.textContent = '+ Ajouter photo'
-  const addImg = document.createElement('input')
-  addImg.type = 'file'
-  addImg.id = 'addImg'
 
   let file = ''
   addImg.addEventListener('change', (e) => {
@@ -168,46 +344,10 @@ function initImgUpload(tagToModify) {
       alert('veuillez utiliser un fichier au format jpeg ou png')
     }
   })
-  const imgInfo = document.createElement('span')
-  imgInfo.textContent = 'jpg, png : 4mo max'
-  div.appendChild(imgLogo)
-  div.appendChild(addImgLabel)
-  div.appendChild(addImg)
-  div.appendChild(imgInfo)
-  modifyGallery.appendChild(div)
 
-  const titleLabel = document.createElement('label')
-  titleLabel.textContent = 'Titre'
-  titleLabel.classList.add('upload__label')
-  const titleInput = document.createElement('input')
-  titleInput.type = 'text'
-  titleInput.name = 'title'
   titleInput.addEventListener('input', () => enableButton())
 
-  const categoryLabel = document.createElement('label')
-  categoryLabel.textContent = 'Catégorie'
-  categoryLabel.classList.add('upload__label')
-  const categorySelect = document.createElement('select')
-  categorySelect.name = 'category'
   categorySelect.addEventListener('change', () => enableButton())
-  const defaultOption = document.createElement('option')
-  defaultOption.hidden = true
-  defaultOption.disabled = true
-  defaultOption.selected = true
-  defaultOption.value = ''
-  categorySelect.appendChild(defaultOption)
-  for (let i = 0; i < categoriesData.length; i++) {
-    const e = categoriesData[i]
-    const option = document.createElement('option')
-    option.value = e.name
-    option.textContent = e.name
-    categorySelect.appendChild(option)
-  }
-
-  modifyGallery.appendChild(titleLabel)
-  modifyGallery.appendChild(titleInput)
-  modifyGallery.appendChild(categoryLabel)
-  modifyGallery.appendChild(categorySelect)
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault()
@@ -238,8 +378,6 @@ function initImgUpload(tagToModify) {
     initGallery()
   })
 
-  button.disabled = true
-  button.textContent = 'Valider'
   button.addEventListener('click', () => () => form.submit())
 
   function enableButton() {
@@ -253,10 +391,105 @@ function initImgUpload(tagToModify) {
       button.disabled = true
     }
   }
+
+  return {
+    div,
+    imgLogo,
+    addImgLabel,
+    addImg,
+    imgInfo,
+    titleLabel,
+    titleInput,
+    categoryLabel,
+    categorySelect,
+    defaultOption,
+    img,
+    h2,
+    modifyGallery,
+    button,
+    form,
+  }
+}
+
+function initImgUploadSelect(tagToModify) {
+  const {
+    div,
+    imgLogo,
+    addImgLabel,
+    addImg,
+    imgInfo,
+    titleLabel,
+    titleInput,
+    categoryLabel,
+    categorySelect,
+    defaultOption,
+    img,
+    h2,
+    modifyGallery,
+    button,
+    form,
+  } = initImgUploadEventListener(tagToModify)
+
+  for (let i = 0; i < categoriesData.length; i++) {
+    const e = categoriesData[i]
+    const option = document.createElement('option')
+    option.value = e.name
+    option.textContent = e.name
+    categorySelect.appendChild(option)
+  }
+
+  return {
+    div,
+    imgLogo,
+    addImgLabel,
+    addImg,
+    imgInfo,
+    titleLabel,
+    titleInput,
+    categoryLabel,
+    categorySelect,
+    defaultOption,
+    img,
+    h2,
+    modifyGallery,
+    button,
+    form,
+  }
+}
+
+function initImgUpload(tagToModify) {
+  let {
+    img,
+    h2,
+    modifyGallery,
+    button,
+    form,
+    div,
+    imgLogo,
+    addImgLabel,
+    addImg,
+    imgInfo,
+    titleLabel,
+    titleInput,
+    categoryLabel,
+    categorySelect,
+    defaultOption,
+  } = initImgUploadSelect(tagToModify)
+
+  div.appendChild(imgLogo)
+  div.appendChild(addImgLabel)
+  div.appendChild(addImg)
+  div.appendChild(imgInfo)
+  modifyGallery.appendChild(div)
+  categorySelect.appendChild(defaultOption)
+  modifyGallery.appendChild(titleLabel)
+  modifyGallery.appendChild(titleInput)
+  modifyGallery.appendChild(categoryLabel)
+  modifyGallery.appendChild(categorySelect)
 }
 
 function removePopup() {
-  const modifyWindow = document.getElementsByClassName('modify__window')[0]
+  const modifyWindow = document.querySelector('.modify__window')
   modifyWindow.remove()
 }
 

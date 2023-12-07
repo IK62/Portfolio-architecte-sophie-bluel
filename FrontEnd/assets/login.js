@@ -1,20 +1,8 @@
-const login__form = document.getElementsByClassName('login__form')[0]
+const login__form = document.querySelector('.login__form')
 
 async function loginUser(target) {
-  let email = ''
-  let password = ''
-
-  for (let i = 0; i < target.length; i++) {
-    const e = target[i]
-
-    if (e.id === 'email') {
-      email = e.value
-    }
-
-    if (e.id === 'password') {
-      password = e.value
-    }
-  }
+  let email = document.getElementById('email').value
+  let password = document.getElementById('password').value
 
   const response = await getData(email, password)
   const data = await response.json()
